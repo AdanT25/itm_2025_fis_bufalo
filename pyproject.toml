@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "A CLI project for teaching Test Driven Development"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["click>=8.1.7"]
+dependencies = ["click>=8.1.7", "yt-dlp>=2024.0.0", "imageio-ffmpeg>=0.4.9"]
 
 [project.scripts]
 bufalo = "bufalo.cli:main"
