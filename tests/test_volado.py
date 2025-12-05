@@ -62,8 +62,9 @@ def test_jugar_volado_resultado_invalido():
 
 def test_comando_volado_muestra_ayuda():
     """
-    Prueba que el grupo 'volado' muestre la ayuda correctamente y el subcomando 'lanzar'.
-    """  # <--- Se quita la sangría de las líneas internas para evitar el error E501
+    Prueba que el grupo 'volado' muestre la ayuda correctamente
+    y el subcomando 'lanzar'.
+    """
     runner = CliRunner()
     result = runner.invoke(volado, ["--help"])  # Invocamos la ayuda del GRUPO
     assert result.exit_code == 0
