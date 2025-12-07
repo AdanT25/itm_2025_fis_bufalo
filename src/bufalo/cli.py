@@ -4,6 +4,8 @@ import pkgutil
 import click
 
 import bufalo.modulos
+import bufalo.modulos.ahorcado
+
 
 
 @click.group()
@@ -11,8 +13,7 @@ def main() -> None:
     """
     🦬  Bufalo 🦬
     """
-    pass
-
+pass
 
 def autodiscover() -> None:
     """
@@ -43,7 +44,7 @@ def autodiscover() -> None:
             click.echo(f"Error cargando módulo {name}: {e}", err=True)
 
 
-autodiscover()
+autodiscover() 
 
 if __name__ == "__main__":
-    main()
+    main() #pragma: no cover
