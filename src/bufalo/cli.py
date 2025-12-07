@@ -43,7 +43,6 @@ def autodiscover() -> None:
             click.echo(f"Error cargando módulo {name}: {e}", err=True)
 
 
-
 autodiscover()
 
 if __name__ == "__main__":

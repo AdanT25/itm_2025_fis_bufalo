@@ -41,7 +41,7 @@ def youtube() -> None:
     "--format",
     default="bestvideo[vcodec^=avc1]+bestaudio[ext=m4a]/best[ext=mp4]/best",
     help=(
-        'Selección de formato (default: '
+        "Selección de formato (default: "
         '"bestvideo[vcodec^=avc1]+bestaudio[ext=m4a]/best[ext=mp4]/best")'
     ),
 )
