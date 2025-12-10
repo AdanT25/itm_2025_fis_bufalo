@@ -12,3 +12,9 @@ def mayuscula(texto: str) -> None:
     result= texto.upper()
     click.echo(result)
 
+@mayusminus.command()
+@click.argument("texto", type=str)
+def minuscula(texto: str) -> None:
+    """Convierte el texto a minúsculas."""
+    result= texto.lower()
+    click.echo(result)
