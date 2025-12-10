@@ -9,6 +9,7 @@ def mayusminus() -> None:
 
 @mayusminus.command()
 @click.argument("texto", type=str)
+# Se introducirá un string y se devolverá el string en mayúsculas
 def mayuscula(texto: str) -> None:
     """Convierte el texto a mayúsculas."""
     result = texto.upper()
@@ -17,6 +18,7 @@ def mayuscula(texto: str) -> None:
 
 @mayusminus.command()
 @click.argument("texto", type=str)
+# Se introducirá un string y se devolverá el string en minúsculas
 def minuscula(texto: str) -> None:
     """Convierte el texto a minúsculas."""
     result = texto.lower()
@@ -25,6 +27,8 @@ def minuscula(texto: str) -> None:
 
 @mayusminus.command(name="toascii")
 @click.argument("texto", type=str)
+# El sep sirve como separador entre los códigos ASCII para cada caracter
+# en el texto
 @click.option("--sep", default=" ", help="Separador entre códigos ASCII")
 def toascii(texto: str, sep: str) -> None:
     """Convierte cada carácter del texto a su código ASCII separado por 'sep'"""
