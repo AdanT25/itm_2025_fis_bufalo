@@ -1,15 +1,12 @@
 """
 Pruebas unitarias para el módulo romanos.
-
-Se prueban dos funciones:
-
 - romano_a_entero: convierte un número romano a entero.
 - entero_a_romano: convierte un entero (1–3999) a número romano.
 """
 
 import pytest
-from bufalo.modulos.romanos import romano_a_entero, entero_a_romano
 
+from bufalo.modulos.romanos import entero_a_romano, romano_a_entero
 
 # ==========================
 #   Pruebas romano -> entero
@@ -77,7 +74,6 @@ def test_romano_MMXXV_es_2025() -> None:
 
 
 def test_romano_MMDCLXVI_es_2666() -> None:
-    # MMDCLXVI = 1000 + 1000 + 500 + 100 + 50 + 10 + 5 + 1 = 2666
     assert romano_a_entero("MMDCLXVI") == 2666
 
 
@@ -107,8 +103,8 @@ def test_entero_a_romano_sustractivos() -> None:
 
 
 def test_entero_a_romano_compuestos() -> None:
-    assert entero_a_romano(58) == "LVIII"      # 50 + 5 + 3
-    assert entero_a_romano(1994) == "MCMXCIV"  # 1000 + 900 + 90 + 4
+    assert entero_a_romano(58) == "LVIII"
+    assert entero_a_romano(1994) == "MCMXCIV"
     assert entero_a_romano(2025) == "MMXXV"
     assert entero_a_romano(2666) == "MMDCLXVI"
 
