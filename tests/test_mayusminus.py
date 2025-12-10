@@ -1,5 +1,7 @@
 from click.testing import CliRunner
+
 from bufalo.modulos.mayusminus import mayusminus
+
 
 def test_convertir_mayus() -> None:
     """Prueba que convierte el texto a mayúsculas."""
@@ -9,10 +11,27 @@ def test_convertir_mayus() -> None:
     assert result.exit_code == 0
     assert "OLA DE SALUDO" in result.output
 
+
 def test_convertir_minus() -> None:
     """Prueba que convierte el texto a minúsculas"""
     runner = CliRunner()
     # Para poder invocar ahora el comando munuscula con argumento un string
-    result = runner.invoke(mayusminus,["minuscula", "OLA DE SALUDO"])
+    result = runner.invoke(mayusminus, ["minuscula", "OLA DE SALUDO"])
     assert result.exit_code == 0
     assert "ola de saludo" in result.output
+
+
+def test_convertir_toascii() -> None:
+    """Prueba que convierte un texto (string) a códigos ASCII."""
+    runner = CliRunner()
+    result = runner.invoke(mayusminus, ["toascii", "ABC"])
+    assert result.exit_code == 0
+    assert "65 66 67" in result.output
+
+
+def test_convertir_fromascii() -> None:
+    """Prueba que convierte códigos ASCII a texto (string)."""
+    runner = CliRunner()
+    result = runner.invoke(mayusminus, ["fromascii", "65 66 67"])
+    assert result.exit_code == 0
+    assert "ABC" in result.output
