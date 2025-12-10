@@ -1,3 +1,5 @@
+import random
+
 import click
 
 OPCIONES = ["piedra", "papel", "tijeras"]
@@ -6,19 +8,21 @@ OPCIONES = ["piedra", "papel", "tijeras"]
 @click.group()
 def ppt():
     """Juego de Piedra, Papel o Tijeras"""
-    pass
 
 
 @ppt.command()
 @click.argument("jugador")
-@click.argument("cpu")
-def jugar(jugador, cpu):
+def jugar(jugador):
     jugador = jugador.lower()
-    cpu = cpu.lower()
 
-    if jugador not in OPCIONES or cpu not in OPCIONES:
-        click.echo("❌ Jugada inválida")
+    if jugador not in OPCIONES:
+        click.echo("❌ Opción inválida. Usa: piedra, papel o tijeras.")
         return
+
+    cpu = random.choice(OPCIONES)
+
+    click.echo(f"Tú: {jugador}")
+    click.echo(f"CPU: {cpu}")
 
     if jugador == cpu:
         click.echo("🤝 Empate")
