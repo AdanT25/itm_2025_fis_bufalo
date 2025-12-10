@@ -1,7 +1,9 @@
 from unittest.mock import MagicMock, patch
-import os
+
 from click.testing import CliRunner
+
 from bufalo.modulos.youtube import youtube
+
 
 @patch("bufalo.modulos.youtube.YoutubeDL")
 @patch("bufalo.modulos.youtube.imageio_ffmpeg")
@@ -65,7 +67,9 @@ def test_invalid_url_scheme():
 
 def test_invalid_domain():
     runner = CliRunner()
-    result = runner.invoke(youtube, ["download", "https://google.com", "--type", "video"])
+    result = runner.invoke(
+        youtube, ["download", "https://google.com", "--type", "video"]
+    )
     assert result.exit_code == 1
     assert "no es válido. Solo se permiten enlaces de YouTube" in result.output
 
@@ -81,7 +85,14 @@ def test_output_dir_write_permission_error(mock_mkdir, mock_access):
     runner = CliRunner()
     result = runner.invoke(
         youtube, 
-        ["download", "https://youtube.com/watch?v=123", "--type", "video", "-o", "/root/protected"]
+        [
+            "download",
+            "https://youtube.com/watch?v=123",
+            "--type",
+            "video",
+            "-o",
+            "/root/protected",
+        ],
     )
     assert result.exit_code == 1
     assert "No se puede acceder al directorio" in result.output
@@ -95,7 +106,9 @@ def test_missing_ffmpeg(mock_shutil_which, mock_get_exe):
     mock_shutil_which.return_value = None
     
     runner = CliRunner()
-    result = runner.invoke(youtube, ["download", "https://youtube.com/watch?v=123", "--type", "video"])
+    result = runner.invoke(
+        youtube, ["download", "https://youtube.com/watch?v=123", "--type", "video"]
+    )
     assert result.exit_code == 1
     assert "No se encontró ffmpeg" in result.output
 
@@ -103,7 +116,9 @@ def test_missing_ffmpeg(mock_shutil_which, mock_get_exe):
 @patch("bufalo.modulos.youtube.imageio_ffmpeg.get_ffmpeg_exe")
 @patch("bufalo.modulos.youtube.shutil.which")
 @patch("bufalo.modulos.youtube.YoutubeDL")
-def test_imageio_fails_but_system_ffmpeg_exists(mock_ydl, mock_shutil_which, mock_get_exe):
+def test_imageio_fails_but_system_ffmpeg_exists(
+    mock_ydl, mock_shutil_which, mock_get_exe
+):
     # Simulate imageio failure BUT system ffmpeg exists
     mock_get_exe.side_effect = Exception("No binary")
     mock_shutil_which.return_value = "/usr/bin/ffmpeg"
@@ -113,7 +128,9 @@ def test_imageio_fails_but_system_ffmpeg_exists(mock_ydl, mock_shutil_which, moc
     mock_ydl.return_value.__enter__.return_value = mock_instance
 
     runner = CliRunner()
-    result = runner.invoke(youtube, ["download", "https://youtube.com/watch?v=123", "--type", "video"])
+    result = runner.invoke(
+        youtube, ["download", "https://youtube.com/watch?v=123", "--type", "video"]
+    )
     assert result.exit_code == 0
     assert "Descarga completada exitosamente" in result.output
 
@@ -128,7 +145,9 @@ def test_download_nonzero_retcode(mock_ffmpeg, mock_ydl):
     mock_ydl.return_value.__enter__.return_value = mock_instance
 
     runner = CliRunner()
-    result = runner.invoke(youtube, ["download", "https://youtube.com/watch?v=123", "--type", "video"])
+    result = runner.invoke(
+        youtube, ["download", "https://youtube.com/watch?v=123", "--type", "video"]
+    )
     assert result.exit_code == 1
     assert "Completado con errores" in result.output
 
