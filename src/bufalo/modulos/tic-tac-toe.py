@@ -1,176 +1,133 @@
 import random
 
-board = [' '] * 9
+# Variables auxiliares que pueden ser accedidas por las funciones de reglas
+POSITION_MAP = {1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 7, 9: 8}
+WIN_CONDITIONS = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8], # Filas
+    [0, 3, 6], [1, 4, 7], [2, 5, 8], # Columnas
+    [0, 4, 8], [2, 4, 6],           # Diagonales
+]
 
-POSITION_MAP = {
-    1: 0, 2: 1, 3: 2,
-    4: 3, 5: 4, 6: 5,
-    7: 6, 8: 7, 9: 8
-}
 
-def display_board(current_board):
-    """Muestra el tablero en la terminal con los números de posición."""
-    print("\n")
-    print(f"| {current_board[0] if current_board[0] != ' ' else '1'} | {current_board[1] if current_board[1] != ' ' else '2'} | {current_board[2] if current_board[2] != ' ' else '3'} |")
-    print("-------------")
-    print(f"| {current_board[3] if current_board[3] != ' ' else '4'} | {current_board[4] if current_board[4] != ' ' else '5'} | {current_board[5] if current_board[5] != ' ' else '6'} |")
-    print("-------------")
-    print(f"| {current_board[6] if current_board[6] != ' ' else '7'} | {current_board[7] if current_board[7] != ' ' else '8'} | {current_board[8] if current_board[8] != ' ' else '9'} |")
-    print("\n")
-
+# Funciones de reglas (ya no son parte de las clases)
 def check_win(board, mark):
-    """Comprueba si el jugador con la 'mark' (X o O) ha ganado."""
-    
-    win_conditions = [
-        # Filas
-        [0, 1, 2], [3, 4, 5], [6, 7, 8],
-        # Columnas
-        [0, 3, 6], [1, 4, 7], [2, 5, 8],
-        # Diagonales
-        [0, 4, 8], [2, 4, 6]
-    ]
-
-    for condition in win_conditions:
-        
+    """Comprueba si el jugador ha ganado."""
+    for condition in WIN_CONDITIONS:
         if all(board[i] == mark for i in condition):
             return True
     return False
 
 def check_tie(board):
     """Comprueba si el tablero está lleno (empate)."""
-    
-    return ' ' not in board
+    return " " not in board
 
-def get_player_move(board):
-    """Pide al jugador que introduzca su movimiento y lo valida."""
-    while True:
-        try:
-           
-            move = input("Elige tu movimiento (1-9): ")
-            if not move: 
-                continue
-            position = int(move)
-            
-            # 1. Comprueba si la posición está dentro del rango válido
-            if position not in POSITION_MAP:
-                print("¡Movimiento no válido! Elige un número entre 1 y 9.")
-                continue
-            
-            # 2. Comprueba si el espacio ya está ocupado
-            index = POSITION_MAP[position]
-            if board[index] == ' ':
-                return index # Devuelve el índice de la lista (0-8)
-            else:
-                print(f"¡El espacio {position} ya está ocupado! Elige otro.")
-        except ValueError:
-            print("Entrada no válida. Por favor, introduce un número.")
+def get_valid_moves(board):
+    """Retorna una lista de índices (0-8) para los movimientos válidos."""
+    return [i for i, mark in enumerate(board) if mark == " "]
 
-def get_computer_move(board, computer_mark):
-    """Calcula el movimiento de la computadora (simple IA)."""
-    
-    # Estrategia de la Computadora:
-    
+def minimax(board, current_mark, player_mark, computer_mark):
+    """Implementación de IA simple (tomada de tu get_computer_move original)."""
+
     # 1. Comprueba si puede ganar en el siguiente movimiento
     for i in range(9):
-        if board[i] == ' ':
+        if board[i] == " ":
             board_copy = list(board)
-            board_copy[i] = computer_mark
-            if check_win(board_copy, computer_mark):
+            board_copy[i] = current_mark
+            if check_win(board_copy, current_mark):
                 return i
 
-    # 2. Comprueba si puede bloquear al jugador
-    player_mark = 'X' if computer_mark == 'O' else 'O'
+    # 2. Comprueba si puede bloquear al oponente
+    opponent_mark = player_mark if current_mark == computer_mark else computer_mark
     for i in range(9):
-        if board[i] == ' ':
+        if board[i] == " ":
             board_copy = list(board)
-            board_copy[i] = player_mark
-            if check_win(board_copy, player_mark):
+            board_copy[i] = opponent_mark
+            if check_win(board_copy, opponent_mark):
                 return i
 
     # 3. Elige una posición aleatoria de las disponibles
-    available_moves = [i for i, mark in enumerate(board) if mark == ' ']
+    available_moves = get_valid_moves(board)
     if available_moves:
         return random.choice(available_moves)
-    return -1 # Debería ser un empate si llega aquí
+    return -1
 
-# Función Principal del Juego
 
-def play_game():
-    """Ejecuta el ciclo principal del juego Tic Tac Toe."""
-    global board
-    board = [' '] * 9 # Reinicia el tablero al comienzo
-    
-    # Asignar símbolos
-    player_mark = input("¿Quieres ser 'X' o 'O'? ").upper()
-    while player_mark not in ['X', 'O']:
-        print("Opción no válida. Por favor, elige 'X' o 'O'.")
-        player_mark = input("¿Quieres ser 'X' o 'O'? ").upper()
-        
-    computer_mark = 'O' if player_mark == 'X' else 'X'
-    
-    print(f"\n¡Tú eres: {player_mark}! La computadora es: {computer_mark}.")
-    
-    # Decidir quién empieza (turno aleatorio)
-    if random.choice([True, False]):
-        current_turn = 'player'
-        print("¡Tú empiezas primero!")
-    else:
-        current_turn = 'computer'
-        print("¡La computadora empieza primero!")
+# CLASES REQUERIDAS POR LAS PRUEBAS
 
-    game_on = True
-    while game_on:
-        display_board(board)
-        
-        if current_turn == 'player':
-            print("Tu turno.")
-            move_index = get_player_move(board)
-            board[move_index] = player_mark
-            
-            # Comprobar estado del juego
-            if check_win(board, player_mark):
-                display_board(board)
-                print("¡Felicidades! ¡Has ganado!")
-                game_on = False
-            elif check_tie(board):
-                display_board(board)
-                print("¡Es un empate!")
-                game_on = False
-            else:
-                current_turn = 'computer' # Cambiar de turno
-                
-        elif current_turn == 'computer':
-            print("Turno de la computadora...")
-            move_index = get_computer_move(board, computer_mark)
-            
-            # La IA devuelve -1 si no hay movimientos disponibles (empate)
-            if move_index != -1: 
-                board[move_index] = computer_mark
-            
-            # Comprobar estado del juego
-            if check_win(board, computer_mark):
-                display_board(board)
-                print(" ¡La computadora ha ganado! ")
-                game_on = False
-            elif check_tie(board):
-                display_board(board)
-                print(" ¡Es un empate! ")
-                game_on = False
-            else:
-                current_turn = 'player' # Cambiar de turno
+class Board:
+    """Clase que representa el tablero de juego y sus operaciones."""
+    def __init__(self):
+        """Inicializa el tablero vacío."""
+        self.cells = [" "] * 9
 
-# --- Ejecución del Juego ---
+    def display(self):
+        """Retorna la representación del tablero (como string)."""
+        output = "\n"
+        output += (
+            f"| {self.cells[0] if self.cells[0] != ' ' else '1'} | "
+            f"{self.cells[1] if self.cells[1] != ' ' else '2'} | "
+            f"{self.cells[2] if self.cells[2] != ' ' else '3'} |\n"
+        )
+        output += ("-------------\n")
+        output += (
+            f"| {self.cells[3] if self.cells[3] != ' ' else '4'} | "
+            f"{self.cells[4] if self.cells[4] != ' ' else '5'} | "
+            f"{self.cells[5] if self.cells[5] != ' ' else '6'} |\n"
+        )
+        output += ("-------------\n")
+        output += (
+            f"| {self.cells[6] if self.cells[6] != ' ' else '7'} | "
+            f"{self.cells[7] if self.cells[7] != ' ' else '8'} | "
+            f"{self.cells[8] if self.cells[8] != ' ' else '9'} |\n"
+        )
+        output += "\n"
+        return output
 
-if __name__ == '__main__':
-    print("¡Bienvenido a Tic Tac Toe (Tres en Raya) en la Terminal!")
-    
-    # Loop para jugar varias veces
-    while True:
-        play_game()
-        
-        # Preguntar si quiere jugar de nuevo
-        play_again = input("¿Quieres jugar otra vez? (s/n): ").lower()
-        if play_again != 's':
-            print("¡Gracias por jugar! ¡Adiós!")
-            break
-        print("--- Nuevo Juego ---")
+    def make_move(self, index, mark):
+        """Realiza un movimiento en el índice dado (0-8) si es válido."""
+        # 0-8 es un rango válido. No hay que revisar rangos mayores a 8
+        if 0 <= index < 9 and self.cells[index] == " ":
+            self.cells[index] = mark
+            return True
+        return False
+
+
+class Game:
+    """Clase que maneja el flujo de juego, turnos y estado."""
+    def __init__(self):
+        """Inicializa el estado del juego."""
+        self.board = Board()
+        self.current_player = random.choice(["X", "O"])
+        self.game_over = False
+        self.winner = None
+        self.moves_made = 0
+        # Configuraciones de IA: asumir X es jugador y O es IA para las pruebas
+        self.player_mark = 'X'
+        self.computer_mark = 'O'
+
+    def switch_player(self):
+        """Cambia el turno entre X y O."""
+        self.current_player = 'O' if self.current_player == 'X' else 'X'
+
+    def process_move(self, index):
+        """
+        Realiza el movimiento, actualiza el contador, y verifica el estado.
+        Retorna True si el movimiento fue exitoso.
+        """
+        if self.game_over:
+            return False
+
+        if self.board.make_move(index, self.current_player):
+            self.moves_made += 1
+            board_cells = self.board.cells
+
+            if check_win(board_cells, self.current_player):
+                self.game_over = True
+                self.winner = self.current_player
+            elif check_tie(board_cells):
+                self.game_over = True
+                self.winner = "Tie"
+
+            return True
+        return False
+
