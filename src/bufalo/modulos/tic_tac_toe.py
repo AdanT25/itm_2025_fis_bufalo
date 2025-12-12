@@ -1,5 +1,6 @@
 import random
-import click 
+
+import click
 
 # =================================================================
 # 1. Variables Globales y de Reglas (LÓGICA INTACTA)
@@ -7,10 +8,16 @@ import click
 
 POSITION_MAP = {1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 7, 9: 8}
 WIN_CONDITIONS = [
-    [0, 1, 2], [3, 4, 5], [6, 7, 8], 
-    [0, 3, 6], [1, 4, 7], [2, 5, 8], 
-    [0, 4, 8], [2, 4, 6],           
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
 ]
+
 
 def check_win(board, mark):
     for condition in WIN_CONDITIONS:
@@ -18,11 +25,14 @@ def check_win(board, mark):
             return True
     return False
 
+
 def check_tie(board):
     return " " not in board
 
+
 def get_valid_moves(board):
     return [i for i, mark in enumerate(board) if mark == " "]
+
 
 def minimax(board, current_mark, player_mark, computer_mark):
     """Implementación de IA simple con estrategia de apertura."""
@@ -34,7 +44,7 @@ def minimax(board, current_mark, player_mark, computer_mark):
                 return i
 
     opponent_mark = player_mark if current_mark != player_mark else computer_mark
-    
+
     for i in range(9):
         if board[i] == " ":
             board_copy = list(board)
@@ -58,6 +68,7 @@ def minimax(board, current_mark, player_mark, computer_mark):
 # 2. Clases de Lógica (POO) (LÓGICA INTACTA)
 # =================================================================
 
+
 class Board:
     def __init__(self):
         self.cells = [" "] * 9
@@ -69,13 +80,13 @@ class Board:
             f"{self.cells[1] if self.cells[1] != ' ' else '2'} | "
             f"{self.cells[2] if self.cells[2] != ' ' else '3'} |\n"
         )
-        output += ("-------------\n")
+        output += "-------------\n"
         output += (
             f"| {self.cells[3] if self.cells[3] != ' ' else '4'} | "
             f"{self.cells[4] if self.cells[4] != ' ' else '5'} | "
             f"{self.cells[5] if self.cells[5] != ' ' else '6'} |\n"
         )
-        output += ("-------------\n")
+        output += "-------------\n"
         output += (
             f"| {self.cells[6] if self.cells[6] != ' ' else '7'} | "
             f"{self.cells[7] if self.cells[7] != ' ' else '8'} | "
@@ -101,11 +112,11 @@ class Game:
         self.game_over = False
         self.winner = None
         self.moves_made = 0
-        self.player_mark = 'X' 
-        self.computer_mark = 'O' 
+        self.player_mark = "X"
+        self.computer_mark = "O"
 
     def switch_player(self):
-        self.current_player = 'O' if self.current_player == 'X' else 'X'
+        self.current_player = "O" if self.current_player == "X" else "X"
 
     def process_move(self, index):
         if self.game_over:
@@ -130,13 +141,14 @@ class Game:
 # 3. Lógica CLI (ADAPTADA AL PATRÓN GRUPO)
 # =================================================================
 
+
 def get_player_input(board):
     """Pide y valida la entrada del usuario."""
     while True:
         try:
             position = click.prompt("Elige tu movimiento (1-9)", type=int)
             index = POSITION_MAP.get(position)
-            
+
             if index is None or not board.cells[index] == " ":
                 click.echo("¡Movimiento no válido! Elige un número disponible (1-9).")
             else:
@@ -160,16 +172,18 @@ def tictactoe():
 def jugar():
     """Ejecuta el juego contra la computadora."""
     click.echo("¡Bienvenido a Tic Tac Toe!")
-    
+
     # 1. Asignar símbolos
-    player_mark = click.prompt("¿Quieres ser 'X' o 'O'?", type=click.Choice(['X', 'O']), show_choices=True)
+    player_mark = click.prompt(
+        "¿Quieres ser 'X' o 'O'?", type=click.Choice(["X", "O"]), show_choices=True
+    )
     computer_mark = "O" if player_mark == "X" else "X"
-    
+
     # 2. Inicializar el juego
-    game = Game() 
+    game = Game()
     game.player_mark = player_mark
     game.computer_mark = computer_mark
-    
+
     click.echo(f"\n¡Tú eres: {player_mark}! La computadora es: {computer_mark}.")
     click.echo(f"¡El jugador {game.current_player} empieza primero!")
 
@@ -186,12 +200,14 @@ def jugar():
         elif game.current_player == computer_mark:
             # Turno de la computadora
             click.echo("Turno de la computadora...")
-            
-            move_index = minimax(game.board.cells, computer_mark, player_mark, computer_mark)
-            
+
+            move_index = minimax(
+                game.board.cells, computer_mark, player_mark, computer_mark
+            )
+
             if move_index != -1 and game.process_move(move_index):
                 game.switch_player()
-            
+
     # 4. Resultado final
     click.echo(game.board.display())
     if game.winner == "Tie":
