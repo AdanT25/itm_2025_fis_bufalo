@@ -188,3 +188,133 @@ def test_multiples_partidas() -> None:
     for i in range(1, 10):
         assert str(i) in result.output
     assert "Turno de: X" in result.output
+
+
+def test_reiniciar_despues_de_victoria() -> None:
+    """
+    Prueba reiniciar después de una victoria.
+
+    Esta prueba asegura que el método reiniciar se cubra completamente,
+    incluso después de que el juego haya terminado con una victoria.
+    """
+    runner = CliRunner()
+    runner.invoke(tictactoe, ["reiniciar"])
+
+    # Jugar hasta que X gane
+    runner.invoke(tictactoe, ["mover", "1"])  # X
+    runner.invoke(tictactoe, ["mover", "4"])  # O
+    runner.invoke(tictactoe, ["mover", "2"])  # X
+    runner.invoke(tictactoe, ["mover", "5"])  # O
+    runner.invoke(tictactoe, ["mover", "3"])  # X gana
+
+    # Verificar que el juego terminó
+    result = runner.invoke(tictactoe, ["estado"])
+    assert "Ganador: X" in result.output
+
+    # Reiniciar y verificar que todo está fresco
+    runner.invoke(tictactoe, ["reiniciar"])
+    result = runner.invoke(tictactoe, ["estado"])
+
+    assert "Jugador actual: X" in result.output
+    assert "Movimientos realizados: 0" in result.output
+    assert "Juego terminado: False" in result.output
+    assert "Ganador:" not in result.output  # No debe haber ganador después de reiniciar
+
+
+def test_tablero_mostrado_en_mover() -> None:
+    """
+    Prueba que el tablero se muestra después de un movimiento exitoso.
+    """
+    runner = CliRunner()
+    runner.invoke(tictactoe, ["reiniciar"])
+
+    result = runner.invoke(tictactoe, ["mover", "5"])
+
+    # Verifica que el movimiento se realizó y el tablero se muestra
+    assert result.exit_code == 0
+    assert "Movimiento realizado" in result.output
+    assert "Turno de: O" in result.output
+    # Verificar que el tablero se muestra (contiene separadores y la X)
+    assert " | " in result.output
+    assert "X" in result.output
+    # Verificar formato específico del tablero
+    assert "4 | X | 6" in result.output
+
+
+def test_estado_con_ganador() -> None:
+    """
+    Prueba que el comando estado muestra el ganador correctamente.
+
+    Cubre la línea que muestra 'Ganador: X' en el comando estado.
+    """
+    runner = CliRunner()
+    runner.invoke(tictactoe, ["reiniciar"])
+
+    # Crear una victoria rápida de X
+    runner.invoke(tictactoe, ["mover", "1"])  # X
+    runner.invoke(tictactoe, ["mover", "4"])  # O
+    runner.invoke(tictactoe, ["mover", "2"])  # X
+    runner.invoke(tictactoe, ["mover", "5"])  # O
+    runner.invoke(tictactoe, ["mover", "3"])  # X gana
+
+    result = runner.invoke(tictactoe, ["estado"])
+
+    assert result.exit_code == 0
+    assert "Ganador: X" in result.output
+    assert "Juego terminado: True" in result.output
+
+
+def test_estado_muestra_empate() -> None:
+    """
+    Prueba que el comando estado muestra 'Resultado: Empate' después de un empate.
+
+    Esta prueba cubre la línea en el comando estado que imprime el mensaje de empate.
+    """
+    runner = CliRunner()
+    runner.invoke(tictactoe, ["reiniciar"])
+
+    # Secuencia GARANTIZADA de empate - DIFERENTE a test_empate
+    # X:1, O:2, X:3, O:4, X:5, O:7, X:6, O:9, X:8
+    # Tablero final:
+    # X | O | X
+    # O | X | X
+    # O | X | O
+    movimientos = [1, 2, 3, 4, 5, 7, 6, 9, 8]
+
+    for pos in movimientos:
+        runner.invoke(tictactoe, ["mover", str(pos)])
+
+    # Llamar al comando estado DOS VECES para asegurar cobertura
+    result1 = runner.invoke(tictactoe, ["estado"])
+
+    assert result1.exit_code == 0
+    assert "Resultado: Empate" in result1.output  # Esto cubre línea 48
+    assert "Juego terminado: True" in result1.output
+    assert "Ganador:" not in result1.output  # No debe haber ganador en un empate
+
+    # Segunda llamada para asegurar
+    result2 = runner.invoke(tictactoe, ["estado"])
+    assert "Resultado: Empate" in result2.output
+
+
+def test_mover_despues_del_juego_terminado() -> None:
+    """
+    Prueba que no se puede mover después de que el juego terminó.
+
+    Cubre la línea 48: return False, "El juego ya terminó."
+    """
+    runner = CliRunner()
+    runner.invoke(tictactoe, ["reiniciar"])
+
+    # Jugar hasta que X gane (juego termina)
+    runner.invoke(tictactoe, ["mover", "1"])  # X
+    runner.invoke(tictactoe, ["mover", "4"])  # O
+    runner.invoke(tictactoe, ["mover", "2"])  # X
+    runner.invoke(tictactoe, ["mover", "5"])  # O
+    runner.invoke(tictactoe, ["mover", "3"])  # X gana
+
+    # Intentar mover después de que el juego terminó
+    result = runner.invoke(tictactoe, ["mover", "6"])
+
+    assert result.exit_code == 0
+    assert "El juego ya terminó" in result.output
